@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+
+# Logs
+logs
+
+# Coverage directory used by tools like istanbul
+coverage
+
+.idea
