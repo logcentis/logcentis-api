@@ -1,15 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { randomUUID } from 'node:crypto';
-import pino from 'pino';
 import pinoHttp from 'pino-http';
 
 import { env } from '@/common/utils/envConfig';
-
-const logger = pino({
-  level: env.isProduction ? 'info' : 'debug',
-  transport: env.isProduction ? undefined : { target: 'pino-pretty' },
-});
+import logger from '@/common/utils/logger';
 
 const getLogLevel = (status: number) => {
   if (status >= StatusCodes.INTERNAL_SERVER_ERROR) return 'error';
@@ -48,11 +43,11 @@ const httpLogger = pinoHttp({
 const captureResponseBody = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!env.isProduction) {
     const originalSend = res.send;
-    res.send = function (body) {
+    res.send = function(body) {
       res.locals.responseBody = body;
       return originalSend.call(this, body);
     };

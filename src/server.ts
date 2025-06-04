@@ -1,15 +1,14 @@
 import express, { type Express } from 'express';
 import helmet from 'helmet';
-import { pino } from 'pino';
 
 import { openAPIRouter } from '@/api-docs/openAPIRouter';
 import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter';
 import errorHandler from '@/common/middleware/errorHandler';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
+import { userRouter } from '@/api/user/userRouter';
 // import { env } from '@/common/utils/envConfig';
 
-const logger = pino({ name: 'server start' });
 const app: Express = express();
 
 // Set the application to trust the reverse proxy
@@ -24,6 +23,7 @@ app.use(rateLimiter);
 
 // Routes
 app.use('/health-check', healthCheckRouter);
+app.use('/user', userRouter);
 
 // Request logging
 app.use(requestLogger);
@@ -34,4 +34,4 @@ app.use('/docs', openAPIRouter);
 // Error handlers
 app.use(errorHandler());
 
-export { app, logger };
+export default app;

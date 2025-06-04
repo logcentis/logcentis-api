@@ -4,7 +4,7 @@ import { z } from 'zod';
 dotenv.config();
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production']).default('production'),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('production'),
   HOST: z.string().min(1).default('localhost'),
   PORT: z.coerce.number().int().positive().default(8080),
 
@@ -31,6 +31,15 @@ const envSchema = z.object({
         code: z.ZodIssueCode.custom,
         message: 'DB_URL_PROD is required in production mode',
         path: ['DB_URL_PROD'],
+      });
+    }
+  }),
+  DB_URL_TEST: z.string().url().optional().superRefine((val, ctx) => {
+    if (process.env.NODE_ENV === 'test' && !val) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'DB_URL_TEST is required in test mode',
+        path: ['DB_URL_TEST'],
       });
     }
   }),
