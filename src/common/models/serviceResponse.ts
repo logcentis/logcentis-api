@@ -1,5 +1,8 @@
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
+
+extendZodWithOpenApi(z);
 
 export class ServiceResponse<T = null> {
   readonly success: boolean;
@@ -59,13 +62,13 @@ export const ServiceSuccessResponseSchema = <T extends z.ZodTypeAny>(
     success: z.literal(true),
     message: z.string(),
     responseObject: dataSchema.optional(),
-    statusCode: z.number(),
+    statusCode: z.number().openapi({ example: StatusCodes.OK }),
   });
 
 export const ServiceErrorResponseSchema = z.object({
   success: z.literal(false),
   message: z.string(),
   responseObject: z.any().optional(),
-  statusCode: z.number(),
-  errorCode: z.string(),
+  statusCode: z.number().openapi({ example: StatusCodes.BAD_REQUEST }),
+  errorCode: z.string().openapi({ example: 'ERR_INVALID_REQ' }),
 });

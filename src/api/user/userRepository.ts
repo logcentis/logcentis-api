@@ -1,17 +1,19 @@
-import db from '@/common/db';
 import { NewUserDTO } from '@/api/user/userModel';
+import db from '@/common/db';
 
-type CreateUserParams = Omit<NewUserDTO, 'password'> & { password_hash: string };
+type CreateUserParams = Omit<NewUserDTO, 'password'> & {
+  passwordHash: string;
+};
 
 class UserRepository {
-
   /**
    * Retrieves a user by their ID.
    * @param userId - The ID of the user to retrieve.
    * @returns A promise that resolves to the user object or null if not found.
    */
   async getUserById(userId: string) {
-    const user = await db.selectFrom('user')
+    const user = await db
+      .selectFrom('user')
       .selectAll()
       .where('id', '=', userId)
       .executeTakeFirst();
@@ -25,7 +27,8 @@ class UserRepository {
    * @returns A promise that resolves to the user object or null if not found.
    */
   async getUserByEmail(email: string) {
-    const result = await db.selectFrom('user')
+    const result = await db
+      .selectFrom('user')
       .where('email', '=', email)
       .selectAll()
       .executeTakeFirst();
@@ -39,11 +42,12 @@ class UserRepository {
    * @returns A promise that resolves to the created user object.
    */
   async createUser(userData: CreateUserParams) {
-    return db.insertInto('user')
+    return db
+      .insertInto('user')
       .values({
         name: userData.name,
         email: userData.email,
-        password_hash: userData.password_hash,
+        passwordHash: userData.passwordHash,
         createdAt: new Date(),
         updatedAt: new Date(),
       })

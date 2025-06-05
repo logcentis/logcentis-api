@@ -2,11 +2,12 @@ import express, { type Express } from 'express';
 import helmet from 'helmet';
 
 import { openAPIRouter } from '@/api-docs/openAPIRouter';
+import { authRouter } from '@/api/auth/authRouter';
 import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter';
+import { userRouter } from '@/api/user/userRouter';
 import errorHandler from '@/common/middleware/errorHandler';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
-import { userRouter } from '@/api/user/userRouter';
 // import { env } from '@/common/utils/envConfig';
 
 const app: Express = express();
@@ -21,12 +22,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(rateLimiter);
 
-// Routes
-app.use('/health-check', healthCheckRouter);
-app.use('/user', userRouter);
-
 // Request logging
 app.use(requestLogger);
+
+// Routes
+app.use('/auth', authRouter);
+app.use('/user', userRouter);
+app.use('/health-check', healthCheckRouter);
 
 // Swagger UI
 app.use('/docs', openAPIRouter);

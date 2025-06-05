@@ -1,10 +1,9 @@
 import { NewUserDTO, UserDTO } from '@/api/user/userModel';
 import userRepository from '@/api/user/userRepository';
-import bcrypt from 'bcryptjs';
 import { ResourceConflictError } from '@/common/exceptions/resourceConflictError';
+import bcrypt from 'bcryptjs';
 
 class UserService {
-
   // async getUserById(userId: string): Promise<UserDTO> {
   //
   // }
@@ -14,12 +13,19 @@ class UserService {
     const existingUser = await userRepository.getUserByEmail(email);
 
     if (existingUser) {
-      throw new ResourceConflictError('User with this email already exists', 'UNQ_EMAIL');
+      throw new ResourceConflictError(
+        'User with this email already exists',
+        'UNQ_EMAIL'
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await userRepository.createUser({ name, email, password_hash: hashedPassword });
+    const newUser = await userRepository.createUser({
+      name,
+      email,
+      passwordHash: hashedPassword,
+    });
 
     return {
       id: newUser.id,

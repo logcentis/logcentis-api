@@ -14,7 +14,10 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "db:migrate": "node --import=tsx src/cli/index.ts --migrate:latest",
     "db:rollback": "node --import=tsx src/cli/index.ts --migrate:down",
-    "db:migrate:to": "node --import=tsx src/cli/index.ts --migrate:to"
+    "db:migrate:to": "node --import=tsx src/cli/index.ts --migrate:to",
+    "db:current": "node --import=tsx src/cli/index.ts --migrate:current",
+    "db:status": "node --import=tsx src/cli/index.ts --migrate:status",
+    "db:types": "kysely-codegen  --camel-case --out-file src/types/db.ts --dialect postgres --url env(DB_URL_DEV)"
   },
   "keywords": [],
   "license": "ISC",

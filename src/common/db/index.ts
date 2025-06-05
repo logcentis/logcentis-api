@@ -1,8 +1,8 @@
-import { Kysely, PostgresDialect } from 'kysely';
-import { Pool } from 'pg';
-import { DB } from '@/types/db';
 import { env } from '@/common/utils/envConfig';
 import logger from '@/common/utils/logger';
+import { DB } from '@/types/db';
+import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely';
+import { Pool } from 'pg';
 
 const poolConfig = {
   production: {
@@ -25,6 +25,7 @@ const dialect = new PostgresDialect({
 
 const db = new Kysely<DB>({
   dialect,
+  plugins: [new CamelCasePlugin()],
   log: (event) => {
     if (env.isDevelopment) {
       logger.debug(event.query.sql);

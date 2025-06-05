@@ -4,6 +4,7 @@ import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import { PostUserSchema, UserSchema } from '@/api/user/userModel';
 import userController from '@/api/user/userController';
 import { validateRequest } from '@/common/utils/httpHandlers';
+import { createApiRequest } from '@/api-docs/openAPIRequestBuilder';
 
 export const userRegistry = new OpenAPIRegistry();
 export const userRouter: Router = express.Router();
@@ -22,6 +23,7 @@ userRegistry.registerPath({
   method: 'post',
   path: '/user',
   tags: ['User'],
+  request: createApiRequest(PostUserSchema),
   responses: createApiResponse(UserSchema, 'New User', 200),
   description: 'Create a new user',
 });
