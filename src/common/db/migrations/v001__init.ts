@@ -43,7 +43,7 @@ export async function up(db: Kysely<DB>): Promise<void> {
         .defaultTo(sql`gen_random_uuid()`)
     )
     .addColumn('user_id', 'uuid', (col) => col.notNull())
-    .addColumn('auth_token', 'text', (col) => col.notNull().unique())
+    // .addColumn('access_token', 'text', (col) => col.notNull().unique())
     .addColumn('refresh_token', 'text', (col) => col.notNull().unique())
     .addColumn('user_agent', 'text', (col) => col.notNull())
     .addColumn('ip_address', 'text', (col) => col.notNull())
@@ -131,9 +131,9 @@ export async function up(db: Kysely<DB>): Promise<void> {
 }
 
 export async function down(db: Kysely<DB>): Promise<void> {
-  await db.schema.dropTable('user').execute();
   await db.schema.dropTable('session').execute();
   await db.schema.dropType('session_status').execute();
-  await db.schema.dropTable('project').execute();
   await db.schema.dropTable('log').execute();
+  await db.schema.dropTable('project').execute();
+  await db.schema.dropTable('user').execute();
 }

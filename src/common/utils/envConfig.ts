@@ -16,33 +16,52 @@ const envSchema = z.object({
 
   COMMON_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(1000),
 
-  DB_URL_DEV: z.string().url().optional().superRefine((val, ctx) => {
-    if (process.env.NODE_ENV === 'development' && !val) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'DB_URL_DEV is required in development mode',
-        path: ['DB_URL_DEV'],
-      });
-    }
-  }),
-  DB_URL_PROD: z.string().url().optional().superRefine((val, ctx) => {
-    if (process.env.NODE_ENV === 'production' && !val) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'DB_URL_PROD is required in production mode',
-        path: ['DB_URL_PROD'],
-      });
-    }
-  }),
-  DB_URL_TEST: z.string().url().optional().superRefine((val, ctx) => {
-    if (process.env.NODE_ENV === 'test' && !val) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'DB_URL_TEST is required in test mode',
-        path: ['DB_URL_TEST'],
-      });
-    }
-  }),
+  JWT_SECRET: z
+    .string()
+    .regex(
+      /^(?:[A-Za-z0-9+/_-]{4})*(?:[A-Za-z0-9+/_-]{2}==|[A-Za-z0-9+/_-]{3}=)?$/,
+      { message: 'JWT_SECRET must be a valid base64 string' }
+    ),
+
+  DB_URL_DEV: z
+    .string()
+    .url()
+    .optional()
+    .superRefine((val, ctx) => {
+      if (process.env.NODE_ENV === 'development' && !val) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'DB_URL_DEV is required in development mode',
+          path: ['DB_URL_DEV'],
+        });
+      }
+    }),
+  DB_URL_PROD: z
+    .string()
+    .url()
+    .optional()
+    .superRefine((val, ctx) => {
+      if (process.env.NODE_ENV === 'production' && !val) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'DB_URL_PROD is required in production mode',
+          path: ['DB_URL_PROD'],
+        });
+      }
+    }),
+  DB_URL_TEST: z
+    .string()
+    .url()
+    .optional()
+    .superRefine((val, ctx) => {
+      if (process.env.NODE_ENV === 'test' && !val) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'DB_URL_TEST is required in test mode',
+          path: ['DB_URL_TEST'],
+        });
+      }
+    }),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

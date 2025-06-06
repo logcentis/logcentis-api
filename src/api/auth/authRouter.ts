@@ -1,13 +1,14 @@
 import { createApiRequest } from '@/api-docs/openAPIRequestBuilder';
 import authController from '@/api/auth/authController';
 import { PostLoginSchema } from '@/api/auth/authModel';
+import requireAuth from '@/common/middleware/requireAuth';
 import { ServiceSuccessResponseSchema } from '@/common/models/serviceResponse';
 import { validateRequest } from '@/common/utils/httpHandlers';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import express from 'express';
+import express, { Router } from 'express';
 import { z } from 'zod';
 
-export const authRouter = express.Router();
+export const authRouter: Router = express.Router();
 export const authRegistry = new OpenAPIRegistry();
 
 authRegistry.registerPath({
@@ -40,3 +41,5 @@ authRouter.post(
   validateRequest(PostLoginSchema),
   authController.login
 );
+
+authRouter.post('/logout', requireAuth, authController.logout);
