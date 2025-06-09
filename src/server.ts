@@ -6,10 +6,12 @@ import { openAPIRouter } from '@/api-docs/openAPIRouter';
 import { authRouter } from '@/api/auth/authRouter';
 import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter';
 import { logRouter } from '@/api/log/logRouter';
+import { projectRouter } from '@/api/project/projectRouter';
 import { userRouter } from '@/api/user/userRouter';
 import errorHandler from '@/common/middleware/errorHandler';
 import rateLimiter from '@/common/middleware/rateLimiter';
 import requestLogger from '@/common/middleware/requestLogger';
+import requireAuth from '@/common/middleware/requireAuth';
 // import { env } from '@/common/utils/envConfig';
 
 const app: Express = express();
@@ -31,6 +33,7 @@ app.use(requestLogger);
 // Routes
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
+app.use('/project', requireAuth, projectRouter);
 app.use('/log', logRouter);
 app.use('/health-check', healthCheckRouter);
 

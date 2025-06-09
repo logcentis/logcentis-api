@@ -28,7 +28,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 export interface Log {
   context: Json | null;
   environment: string;
-  id: string;
+  id: Generated<string>;
   isHandled: Generated<boolean>;
   level: string;
   message: string;
@@ -40,11 +40,11 @@ export interface Log {
 
 export interface Project {
   createdAt: Generated<Timestamp>;
-  description: string;
-  id: string;
+  description: string | null;
+  id: Generated<string>;
   name: string;
+  ownerId: string;
   updatedAt: Generated<Timestamp>;
-  userId: string;
 }
 
 export interface Session {

@@ -68,10 +68,11 @@ export async function up(db: Kysely<DB>): Promise<void> {
 
   await db.schema
     .createTable('project')
-    .addColumn('id', 'uuid', (col) => col.primaryKey().notNull())
-    .addColumn('user_id', 'uuid', (col) => col.notNull())
+    .addColumn('id', 'uuid', (col) => col.primaryKey().notNull().defaultTo(sql`gen_random_uuid
+    ()`))
+    .addColumn('owner_id', 'uuid', (col) => col.notNull())
     .addColumn('name', 'text', (col) => col.notNull())
-    .addColumn('description', 'text', (col) => col.notNull())
+    .addColumn('description', 'text')
     .addColumn('created_at', 'timestamp', (col) =>
       col
         .defaultTo(
@@ -90,7 +91,7 @@ export async function up(db: Kysely<DB>): Promise<void> {
     )
     .addForeignKeyConstraint(
       'project_user_id_fkey',
-      ['user_id'],
+      ['owner_id'],
       'user',
       ['id'],
       (fk) => fk.onDelete('cascade')
@@ -99,7 +100,8 @@ export async function up(db: Kysely<DB>): Promise<void> {
 
   await db.schema
     .createTable('log')
-    .addColumn('id', 'uuid', (col) => col.primaryKey().notNull())
+    .addColumn('id', 'uuid', (col) => col.primaryKey().notNull().defaultTo(sql`gen_random_uuid
+    ()`))
     .addColumn('project_id', 'uuid', (col) => col.notNull())
     .addColumn('level', 'text', (col) => col.notNull())
     .addColumn('message', 'text', (col) => col.notNull())

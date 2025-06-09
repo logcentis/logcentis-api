@@ -3,12 +3,16 @@ import { StatusCodes } from 'http-status-codes';
 
 export default class ResourceNotFoundError extends AppHttpError {
   constructor(resource?: string, id?: string | number) {
+    let formattedMessage: string;
+
     if (resource && id) {
-      super(`Resource not found: ${resource} with ID ${id}`, StatusCodes.NOT_FOUND, 'RES_NOT_FND');
+      formattedMessage = `${resource} with ID ${id} not found`;
     } else if (resource) {
-      super(`Resource not found: ${resource}`);
+      formattedMessage = `${resource} not found`;
     } else {
-      super('Resource not found');
+      formattedMessage = 'Resource not found';
     }
+
+    super(formattedMessage, StatusCodes.NOT_FOUND, 'RES_NOT_FND');
   }
 }
