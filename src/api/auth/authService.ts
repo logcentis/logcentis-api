@@ -12,11 +12,12 @@ import { Selectable } from 'kysely';
 
 class AuthService {
   /**
-   * Logs in a user by validating their email and password.
-   * @param email - The email of the user.
-   * @param password - The password of the user.
-   * @throws ResourceNotFoundError if the user is not found.
-   * @throws Error if the credentials are invalid.
+   * Logs in a user with email and password.
+   * @param email - The user's email.
+   * @param password - The user's password.
+   * @param ipAddress - The IP address of the user.
+   * @param userAgent - The user agent of the user's device.
+   * @returns An object containing access and refresh tokens, and session information.
    */
   async login(
     email: string,
@@ -39,20 +40,28 @@ class AuthService {
     return await this.generateTokens(user, ipAddress, userAgent);
   }
 
+  /**
+   * Generates access and refresh tokens for a user.
+   * @param user - The user for whom the tokens are generated.
+   * @param ipAddress - The IP address of the user.
+   * @param userAgent - The user agent of the user's device.
+   * @param session - Optional session ID or session object.
+   * @returns An object containing the generated tokens and session information.
+   */
   async generateTokens(
     user: UserDTO,
     ipAddress: string,
     userAgent: string,
-    sessionId?: string
+    session?: string | Selectable<Session>
   ) {
-    let userSession: Selectable<Session> | null = null;
+    let userSession = typeof session == 'object' ? session : null;
 
-    if (sessionId) {
+    if (typeof session == 'string') {
       userSession = this.validateSession(
-        await sessionRepository.getSession(sessionId)
+        await sessionRepository.getSession(session)
       );
     } else {
-      sessionId = crypto.randomUUID();
+      session = crypto.randomUUID();
     }
 
     const secret = jose.base64url.decode(env.JWT_SECRET);
@@ -62,7 +71,7 @@ class AuthService {
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     const refreshTokenPromise = new jose.EncryptJWT({
-      sessionId: userSession?.id || sessionId,
+      sessionId: userSession?.id || session,
     })
       .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
       .setIssuedAt()
@@ -72,7 +81,7 @@ class AuthService {
       .encrypt(secret);
 
     const accessTokenPromise = new jose.EncryptJWT({
-      sessionId: userSession?.id || sessionId,
+      sessionId: userSession?.id || session,
       user: {
         id: user.id,
         email: user.email,
@@ -93,7 +102,7 @@ class AuthService {
 
     if (!userSession) {
       userSession = await sessionRepository.createSession({
-        id: sessionId,
+        id: session,
         userId: user.id,
         expiresAt,
         ipAddress,
@@ -115,6 +124,13 @@ class AuthService {
     };
   }
 
+  /**
+   * Refreshes the access and refresh tokens for a user.
+   * @param refreshToken - The refresh token provided by the user.
+   * @param sessionId - The session ID associated with the user.
+   * @param ipAddress - The IP address of the user.
+   * @param userAgent - The user agent of the user's device.
+   */
   async refreshTokens(
     refreshToken: string,
     sessionId: string,
@@ -140,7 +156,7 @@ class AuthService {
       user,
       ipAddress,
       userAgent,
-      session.id
+      session
     );
 
     return {

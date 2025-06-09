@@ -8,7 +8,7 @@ export const logRouter: Router = express.Router();
 logRouter.get('/', requireAuth, (req, res) => {
   res.status(200).json({
     message: 'Log endpoint is working',
-    user: req.user, // Assuming req.user is set by requireAuth middleware
+    user: req.user,
     session: req.session,
   });
 });

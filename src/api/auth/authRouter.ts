@@ -7,6 +7,7 @@ import { validateRequest } from '@/common/utils/httpHandlers';
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import express, { Router } from 'express';
 import { z } from 'zod';
+import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 
 export const authRouter: Router = express.Router();
 export const authRegistry = new OpenAPIRegistry();
@@ -19,7 +20,7 @@ authRegistry.registerPath({
   responses: {
     200: {
       description:
-        'Login successful. Returns two httpOnly cookies: access_token and refresh_token.',
+        'Login successful. Returns two httpOnly cookies: access_token and refresh_token and starts a session.',
       headers: {
         'Set-Cookie': {
           schema: { type: 'string' },
@@ -33,7 +34,7 @@ authRegistry.registerPath({
       },
     },
   },
-  description: 'Login user and set auth cookies',
+  description: 'Login user and starts a session',
 });
 
 authRouter.post(
@@ -41,5 +42,14 @@ authRouter.post(
   validateRequest(PostLoginSchema),
   authController.login
 );
+
+authRegistry.registerPath({
+  method: 'post',
+  path: '/auth/logout',
+  tags: ['Auth'],
+  security: [{ cookieAuth: [] }],
+  responses: createApiResponse(z.null(),'Logout successful. Erases httpOnly cookies: access_token and refresh_token and finishes session.', 200),
+  description: 'Logout user and finish session',
+});
 
 authRouter.post('/logout', requireAuth, authController.logout);
