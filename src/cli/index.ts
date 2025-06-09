@@ -48,6 +48,10 @@ const options = {
     description: 'Display the current version of the application',
     usage: '--migrate:current',
   },
+  createModule: {
+    description: 'Create a new module',
+    usage: '--create:module <name>',
+  },
 };
 
 switch (args[0]) {
@@ -84,7 +88,7 @@ switch (args[0]) {
       });
     break;
 
-  case options.migrateTo.usage:
+  case options.migrateTo.usage.split(' ')[0]:
     import('@/common/db/migrator')
       .then(({ migrateToVersion }) => {
         if (args[1]) {
@@ -115,6 +119,20 @@ switch (args[0]) {
         logger.error('Failed to get current version:', error);
         process.exit(1);
       });
+    break;
+
+  case options.createModule.usage.split(' ')[0]:
+    if (args[1]) {
+      import('./functions/createModule')
+        .then(({ createModule }) => createModule(args[1]))
+        .catch((error) => {
+          logger.error(`Failed to create module ${args[1]}:`, error);
+          process.exit(1);
+        });
+    } else {
+      logger.error('No module name specified for creation');
+      process.exit(1);
+    }
     break;
 
   default:
