@@ -3,7 +3,7 @@ name: Integrity Check
 on:
   push:
     branches:
-      - "**"
+      - '**'
   pull_request:
     branches:
       - development
@@ -13,6 +13,26 @@ jobs:
   integrity:
     name: Lint and Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test123
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      DB_URL_TEST: postgresql://postgres:test123@localhost:5432/test_db
+      JWT_SECRET: D8N0YxCY6Cec8qJr8dLDJHY7AzPOgFe6XCdK4aWXpnQ=
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -32,6 +52,15 @@ jobs:
 
       - name: Run Lint
         run: pnpm lint
+
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -U postgres; do
+            sleep 1
+          done
+
+      - name: Run migrations
+        run: npm run db:migrate
 
       - name: Run Tests
         run: pnpm test

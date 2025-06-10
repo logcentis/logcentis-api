@@ -1,7 +1,7 @@
 import { NewProjectDTO } from '@/api/project/projectModel';
 import db from '@/common/db';
 
-class ProjectRepository {
+export class ProjectRepository {
   async createProject(newProject: NewProjectDTO, ownerId: string) {
     return await db
       .insertInto('project')
@@ -23,4 +23,4 @@ class ProjectRepository {
   }
 }
 
-export default new ProjectRepository();
+export const projectRepository = new ProjectRepository();

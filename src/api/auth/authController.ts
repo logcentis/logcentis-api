@@ -1,5 +1,5 @@
-import authService from '@/api/auth/authService';
-import sessionRepository from '@/api/auth/sessionRepository';
+import { authService } from '@/api/auth/authService';
+import { sessionRepository } from '@/api/auth/sessionRepository';
 import { AuthenticationError } from '@/common/exceptions/authenticationError';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import { env } from '@/common/utils/envConfig';

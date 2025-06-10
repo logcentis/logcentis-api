@@ -1,9 +1,15 @@
 import { NewProjectDTO } from '@/api/project/projectModel';
-import projectRepository from '@/api/project/projectRepository';
+import { ProjectRepository } from '@/api/project/projectRepository';
 
 class ProjectService {
+  private projectRepository: ProjectRepository;
+
+  constructor(projectRepository = new ProjectRepository()) {
+    this.projectRepository = projectRepository;
+  }
+
   public async createProject(projectData: NewProjectDTO, ownerId: string) {
-    const newProject = await projectRepository.createProject(
+    const newProject = await this.projectRepository.createProject(
       projectData,
       ownerId
     );
@@ -12,4 +18,4 @@ class ProjectService {
   }
 }
 
-export default new ProjectService();
+export const projectService = new ProjectService();

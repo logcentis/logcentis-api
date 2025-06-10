@@ -7,6 +7,7 @@ import { authRegistry } from '@/api/auth/authRouter';
 import { healthCheckRegistry } from '@/api/healthCheck/healthCheckRouter';
 import { logRegistry } from '@/api/log/logRouter';
 import { userRegistry } from '@/api/user/userRouter';
+import { projectRegistry } from '@/api/project/projectRouter';
 
 export type OpenAPIDocument = ReturnType<
   OpenApiGeneratorV3['generateDocument']
@@ -18,6 +19,7 @@ export function generateOpenAPIDocument(): OpenAPIDocument {
     userRegistry,
     authRegistry,
     logRegistry,
+    projectRegistry
   ]);
   const generator = new OpenApiGeneratorV3(registry.definitions);
 

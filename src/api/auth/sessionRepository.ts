@@ -10,7 +10,7 @@ interface PartialSession {
   accessToken: string;
 }
 
-class SessionRepository {
+export class SessionRepository {
   async getSession(sessionId: string) {
     return (
       (await db
@@ -59,4 +59,4 @@ class SessionRepository {
   }
 }
 
-export default new SessionRepository();
+export const sessionRepository = new SessionRepository();

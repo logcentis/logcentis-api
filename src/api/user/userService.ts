@@ -1,16 +1,18 @@
 import { NewUserDTO, UserDTO } from '@/api/user/userModel';
-import userRepository from '@/api/user/userRepository';
+import { UserRepository } from '@/api/user/userRepository';
 import { ResourceConflictError } from '@/common/exceptions/resourceConflictError';
 import bcrypt from 'bcryptjs';
 
-class UserService {
-  // async getUserById(userId: string): Promise<UserDTO> {
-  //
-  // }
+export class UserService {
+  private userRepository: UserRepository;
+
+  constructor(userRepository = new UserRepository()) {
+    this.userRepository = userRepository;
+  }
 
   async createUser(userData: NewUserDTO): Promise<UserDTO> {
     const { name, email, password } = userData;
-    const existingUser = await userRepository.getUserByEmail(email);
+    const existingUser = await this.userRepository.getUserByEmail(email);
 
     if (existingUser) {
       throw new ResourceConflictError(
@@ -21,7 +23,7 @@ class UserService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await userRepository.createUser({
+    const newUser = await this.userRepository.createUser({
       name,
       email,
       passwordHash: hashedPassword,
@@ -35,4 +37,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export const userService = new UserService();

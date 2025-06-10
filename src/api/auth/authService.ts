@@ -1,6 +1,6 @@
-import sessionRepository from '@/api/auth/sessionRepository';
+import { SessionRepository } from '@/api/auth/sessionRepository';
 import { UserDTO } from '@/api/user/userModel';
-import userRepository from '@/api/user/userRepository';
+import { UserRepository } from '@/api/user/userRepository';
 import { AuthenticationError } from '@/common/exceptions/authenticationError';
 import { InvalidCredentialsError } from '@/common/exceptions/invalidCredentialsError';
 import ResourceNotFoundError from '@/common/exceptions/resourceNotFoundError';
@@ -10,7 +10,18 @@ import bcrypt from 'bcryptjs';
 import * as jose from 'jose';
 import { Selectable } from 'kysely';
 
-class AuthService {
+export class AuthService {
+  private userRepository: UserRepository;
+  private sessionRepository: SessionRepository;
+
+  constructor(
+    userRepository = new UserRepository(),
+    sessionRepository = new SessionRepository()
+  ) {
+    this.userRepository = userRepository;
+    this.sessionRepository = sessionRepository;
+  }
+
   /**
    * Logs in a user with email and password.
    * @param email - The user's email.
@@ -25,7 +36,7 @@ class AuthService {
     ipAddress: string,
     userAgent: string
   ) {
-    const user = await userRepository.getUserByEmail(email);
+    const user = await this.userRepository.getUserByEmail(email);
 
     if (!user) {
       throw new ResourceNotFoundError('User');
@@ -58,7 +69,7 @@ class AuthService {
 
     if (typeof session == 'string') {
       userSession = this.validateSession(
-        await sessionRepository.getSession(session)
+        await this.sessionRepository.getSession(session)
       );
     } else {
       session = crypto.randomUUID();
@@ -101,7 +112,7 @@ class AuthService {
     ]);
 
     if (!userSession) {
-      userSession = await sessionRepository.createSession({
+      userSession = await this.sessionRepository.createSession({
         id: session,
         userId: user.id,
         expiresAt,
@@ -111,7 +122,7 @@ class AuthService {
         accessToken,
       });
     } else {
-      userSession = await sessionRepository.updateSessionToken(
+      userSession = await this.sessionRepository.updateSessionToken(
         userSession.id,
         refreshToken
       );
@@ -138,15 +149,15 @@ class AuthService {
     userAgent: string
   ) {
     const session = this.validateSession(
-      await sessionRepository.getSession(sessionId)
+      await this.sessionRepository.getSession(sessionId)
     );
 
     if (session.refreshToken !== refreshToken) {
-      await sessionRepository.logoutSession(session.id);
+      await this.sessionRepository.logoutSession(session.id);
       throw new AuthenticationError('Invalid refresh token');
     }
 
-    const user = await userRepository.getUserById(session.userId);
+    const user = await this.userRepository.getUserById(session.userId);
 
     if (!user) {
       throw new ResourceNotFoundError('User');
@@ -173,7 +184,7 @@ class AuthService {
       throw new AuthenticationError('Session is inactive');
     }
     if (session.expiresAt < new Date()) {
-      sessionRepository.logoutSession(session.id);
+      this.sessionRepository.logoutSession(session.id);
       throw new AuthenticationError('Session expired');
     }
 
@@ -181,4 +192,4 @@ class AuthService {
   }
 }
 
-export default new AuthService();
+export const authService = new AuthService();

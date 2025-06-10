@@ -5,7 +5,7 @@ type CreateUserParams = Omit<NewUserDTO, 'password'> & {
   passwordHash: string;
 };
 
-class UserRepository {
+export class UserRepository {
   /**
    * Retrieves a user by their ID.
    * @param userId - The ID of the user to retrieve.
@@ -56,4 +56,4 @@ class UserRepository {
   }
 }
 
-export default new UserRepository();
+export const userRepository = new UserRepository();

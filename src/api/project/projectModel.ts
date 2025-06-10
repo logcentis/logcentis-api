@@ -3,23 +3,32 @@ import { z } from 'zod';
 
 extendZodWithOpenApi(z);
 
-export type NewProjectDTO = z.infer<typeof NewProjectSchema>;
-export const NewProjectSchema = z.object({
-  name: z.string().min(1, { message: 'Project name is required' }).openapi({
+const name = z
+  .string()
+  .min(1, { message: 'Project name is required' })
+  .openapi({
     description: 'The name of the project',
     example: 'My Project',
-  }),
-  description: z.string().optional().openapi({
-    description: 'A brief description of the project',
-    example: 'This is a sample project description.',
-  }),
+  });
+
+const description = z.string().optional().openapi({
+  description: 'A brief description of the project',
+  example: 'This is a sample project description.',
+});
+
+export type NewProjectDTO = z.infer<typeof NewProjectSchema>;
+export const NewProjectSchema = z.object({
+  name,
+  description,
 });
 
 export type ProjectDTO = z.infer<typeof ProjectSchema>;
-export const ProjectSchema = NewProjectSchema.extend({
+export const ProjectSchema = z.object({
   id: z.string().uuid().openapi({
     description: 'The unique identifier of the project',
   }),
+  name,
+  description,
   ownerId: z.string().uuid().openapi({
     description: 'The unique identifier of the user who owns the project',
   }),

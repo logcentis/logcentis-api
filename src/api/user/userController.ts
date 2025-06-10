@@ -1,4 +1,4 @@
-import userService from '@/api/user/userService';
+import { userService } from '@/api/user/userService';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';

@@ -1,5 +1,6 @@
-import projectRepository from '@/api/project/projectRepository';
-import projectService from '@/api/project/projectService';
+// import { ProjectRepository } from '@/api/project/projectRepository';
+import { projectRepository } from '@/api/project/projectRepository';
+import { projectService } from '@/api/project/projectService';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
